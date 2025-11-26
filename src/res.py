@@ -222,12 +222,12 @@ def find_clause_name(clause, clause_dict):
 
 def has_constants(clause):
     # содержит ли клауза константы
-    constants = ['Марк', 'Цезарь']
     for lit in clause:
         if isinstance(lit, tuple) and lit[0] != 'not':
             terms = lit[1] if isinstance(lit[1], tuple) else (lit[1],)
-            if any(c in terms for c in constants):
-                return True
+            for term in terms:
+                if isinstance(term, str) and term and term[0].isupper():
+                    return True
     return False
 
 
