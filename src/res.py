@@ -298,7 +298,14 @@ def prove(clauses):
                     print("\nПолная последовательность шагов:")
                     for step in steps:
                         print(step)
-                    print(f"Формула доказана за {len(steps)} шагов")
+                    def get_step_word(count):
+                        if count % 10 == 1 and count % 100 != 11:
+                            return "шаг"
+                        elif count % 10 in [2, 3, 4] and count % 100 not in [12, 13, 14]:
+                            return "шага"
+                        else:
+                            return "шагов"
+                    print(f"Формула доказана за {len(steps)} {get_step_word(len(steps))}")
                     print("\nПолезные резолюции (шаги):")
                     for step in useful_steps:
                         print(step)
