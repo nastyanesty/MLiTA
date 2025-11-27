@@ -70,7 +70,7 @@ def apply_substitution(expr, substitution):
     if isinstance(expr, tuple):
         # отрицание
         if len(expr) == 2 and expr[0] == 'not':
-            return ('not', apply_substitution(expr[1], substitution))
+            return 'not', apply_substitution(expr[1], substitution)
         # по всем элементам кортежа
         else:
             return tuple(apply_substitution(item, substitution) for item in expr)
@@ -83,8 +83,6 @@ def resolve_clauses(clause1, clause2):
 
     for i, lit1 in enumerate(clause1):
         for j, lit2 in enumerate(clause2):
-            pos_lit = None
-            neg_lit = None
             # пары предикат - предикат с отрицанием
             if is_predicate(lit1) and lit2[0] == 'not' and is_predicate(lit2[1]):
                 pos_lit = lit1
@@ -343,33 +341,33 @@ def prove(clauses):
 def reconstruct_proof_path(clause1_name, clause2_name, parent_map, clause_dict, length):
     # путь доказательства от пустой клаузы к начальным клаузам
 
-    def get_all_ancestors(clause_name):
+    def get_all_ancestors(anc_clause_name):
         # рекурсивно собирает всех предков клаузы
-        ancestors = {clause_name}
-        if clause_name in parent_map:
-            parent1, parent2, _ = parent_map[clause_name]
-            ancestors.update(get_all_ancestors(parent1))
-            ancestors.update(get_all_ancestors(parent2))
+        ancestors = {anc_clause_name}
+        if anc_clause_name in parent_map:
+            parent_1, parent_2, _ = parent_map[anc_clause_name]
+            ancestors.update(get_all_ancestors(parent_1))
+            ancestors.update(get_all_ancestors(parent_2))
         return ancestors
 
-    def topological_sort(clause_names, parent_map):
+    def topological_sort(clause_names):
         # сортировка клауз по зависимостям
         visited = set()
         result = []
 
-        def visit(clause_name):
-            if clause_name in visited:
+        def visit(visit_clause_name):
+            if visit_clause_name in visited:
                 return
-            visited.add(clause_name)
+            visited.add(visit_clause_name)
             # сначала родители (если они есть)
-            if clause_name in parent_map:
-                parent1, parent2, _ = parent_map[clause_name]
+            if visit_clause_name in parent_map:
+                parent_1, parent_2, _ = parent_map[visit_clause_name]
                 # только производные клаузы (не начальные)
-                if parent1 in parent_map or not parent1.startswith('C') or int(parent1[1:]) > length:
-                    visit(parent1)
-                if parent2 in parent_map or not parent2.startswith('C') or int(parent2[1:]) > length:
-                    visit(parent2)
-            result.append(clause_name)
+                if parent_1 in parent_map or not parent_1.startswith('C') or int(parent_1[1:]) > length:
+                    visit(parent_1)
+                if parent_2 in parent_map or not parent_2.startswith('C') or int(parent_2[1:]) > length:
+                    visit(parent_2)
+            result.append(visit_clause_name)
         for clause in clause_names:
             visit(clause)
         return result
@@ -389,7 +387,7 @@ def reconstruct_proof_path(clause1_name, clause2_name, parent_map, clause_dict, 
     initial_clauses.sort(key=lambda x: int(x[1:]))
 
     # производные клаузы - сортировка
-    sorted_derived = topological_sort(derived_clauses, parent_map)
+    sorted_derived = topological_sort(derived_clauses)
 
     # упорядоченный вывод
     useful_steps = []
