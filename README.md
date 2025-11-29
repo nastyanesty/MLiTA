@@ -18,3 +18,7 @@ Termination Condition: The process continues until an "empty" resolvent (a contr
 ## Examples - main.py, test.py
 
 Basic resolvents created from a text of problem using LLM
+
+## Parsing - helper.py
+
+Preparing basic resolvents for input
